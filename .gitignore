@@ -29,6 +29,17 @@ target/
 .settings/
 .classpath
 .project
+*.pydevproject
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.loadpath
 
 # NetBeans specific
 nbproject/private/
@@ -39,6 +50,11 @@ nbdist/
 nbactions.xml
 nb-configuration.xml
 
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
 
 # OS
 .DS_Store
