@@ -1,2 +1,2 @@
-# AVL
+# AVLTree
 AVL Trees implementation in Java.
