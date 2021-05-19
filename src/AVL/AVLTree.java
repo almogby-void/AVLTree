@@ -1,3 +1,4 @@
+package AVL;
 /**
  * public class AVLNode
  * <p>
@@ -400,6 +401,13 @@ public class AVLTree {
             this.setSize(this.left.size + this.right.size + 1);
             this.setBF(this.left.height - this.right.height);
         }
+
+		@Override
+		public String toString() {
+			if (!this.isRealNode())
+				return "null";
+			return this.value + ":" + Integer.toString(this.key) + " " + "h = " + this.height;
+		}
     }
 
 }
