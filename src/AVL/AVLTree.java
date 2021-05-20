@@ -149,8 +149,61 @@ public class AVLTree {
         if (!x.isRealNode())
         	return -1;
         int count = 0;
-        
+        if (x.getHeight() == 0)
+        	remove(x);
+        else if (x.getLeft().isRealNode())
+        	if (x.getRight().isRealNode()) {
+        		AVLNode y = x.getRight();
+        		if (!y.getLeft().isRealNode())
+        			y.getParent().setRight(y.getRight());
+        		else {
+	        		while (y.getLeft().isRealNode())
+	        			y = y.getLeft();
+	        		y.getParent().setLeft(y.getRight());
+        		}
+        		y.setLeft(x.getLeft());
+        		y.setRight(x.getRight());
+        		y.setParent(x.getParent());
+        	}
+        	else
+        		x.getLeft().setParent(x.getParent());
+        else
+        	x.getRight().setParent(x.getParent());
+        while ((x = x.getParent()) != null) {
+    		x.update();
+    		if (Math.abs(x.getBF()) == 2) { // criminal has been detected
+    			if (x.getBF() == -2) {
+    				if (x.getRight().getBF() == -1) { // case1
+    					this.rotateLeft(x);
+    				}
+    				else { // case2
+    					this.rotateRight(x.getRight());
+    					this.rotateLeft(x);
+    				}
+    			}
+    			else if (x.getLeft().getBF() == -1) { // case3
+    				this.rotateLeft(x.getLeft());
+					this.rotateRight(x);
+    			}
+				else { // case4
+					this.rotateRight(x);
+				}
+    			count++;
+    		}
+    	}
         return count;
+    }
+    
+    public void remove(AVLNode node) {
+    	if (this.root == node) {
+    		this.root = this.virt;
+    		return;
+    	}
+    	AVLNode par = node.getParent();
+    	if (par.getLeft() == node)
+    		par.setLeft(this.virt);
+    	else
+    		par.setRight(this.virt);
     }
 
     /**
@@ -211,6 +264,8 @@ public class AVLTree {
      * Returns the root AVL node, or null if the tree is empty
      */
     public AVLNode getRoot() {
+    	if (this.empty())
+    		return null;
         return this.root;
     }
 
