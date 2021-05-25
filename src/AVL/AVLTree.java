@@ -277,24 +277,6 @@ public class AVLTree {
     		ind = ord_rec(node.getRight(), arr, ind);
     	return ind;
     }
-    
-//    private int keys_in_order_rec(AVLNode node, int[] arr, int ind) {
-//    	if (node.hasLeft())
-//	    	ind = keys_in_order_rec(node.getLeft(), arr, ind);
-//    	arr[ind++] = node.getKey();
-//    	if (node.hasRight())
-//	    	ind = keys_in_order_rec(node.getRight(), arr, ind);	
-//    	return ind;
-//    }
-//    
-//    private int values_in_order_rec(AVLNode node, boolean[] arr, int ind) {
-//    	if (node.hasLeft())
-//	    	ind = values_in_order_rec(node.getLeft(), arr, ind);
-//    	arr[ind++] = node.getValue();
-//    	if (node.hasRight())
-//	    	ind = values_in_order_rec(node.getRight(), arr, ind);	
-//    	return ind;
-//    }
 
     /**
      * public int size()
