@@ -1,5 +1,7 @@
 package AVL;
 
+import java.lang.reflect.Array;
+
 /**
  * public class AVLNode
  * <p>
@@ -102,7 +104,7 @@ public class AVLTree {
      */
     public int insert(int k, boolean i) {
     	if (this.empty()) {
-    		this.root = new AVLNode(i, k);
+    		this.min = this.max = this.root = new AVLNode(i, k);
     		return 0;
     	}
     	AVLNode x = this.bin_search(k, true);
@@ -114,6 +116,10 @@ public class AVLTree {
     		x.setRight(new_node);
     	else
     		x.setLeft(new_node);
+    	if (k < this.min.getKey())
+    		this.min = new_node;
+    	else if (k > this.max.getKey())
+    		this.max = new_node;
     	new_node.setSucc(findSucc(new_node));
     	AVLNode pred = findPred(new_node);
     	if (pred != null)
@@ -242,7 +248,7 @@ public class AVLTree {
     public int[] keysToArray() {
         int[] arr = new int[this.size()];
         if (arr.length > 0)
-        	ord_rec(this.getRoot(), arr, 0);
+        	drec(this.getRoot(), arr, 0, false);
         return arr;
     }
 
@@ -256,25 +262,19 @@ public class AVLTree {
     public boolean[] infoToArray() {
         boolean[] arr = new boolean[this.size()];
         if (arr.length > 0)
-        	ord_rec(this.getRoot(), arr, 0);
+        	drec(this.getRoot(), arr, 0, true);
         return arr;
     }
     
-    private int ord_rec(AVLNode node, int[] arr, int ind) {
+    private int drec(AVLNode node, Object arr, int ind, boolean b) {
     	if (node.hasLeft())
-	    	ind = ord_rec(node.getLeft(), arr, ind);
-    	arr[ind++] = node.getKey();
+    		ind = drec(node.getLeft(), arr, ind, b);
+    	if (b)
+    		Array.setBoolean(arr, ind++, node.getValue());
+    	else
+    		Array.setInt(arr, ind++, node.getKey());
     	if (node.hasRight())
-    		ind = ord_rec(node.getRight(), arr, ind);
-    	return ind;
-    }
-    
-    private int ord_rec(AVLNode node, boolean[] arr, int ind) {
-    	if (node.hasLeft())
-    		ind = ord_rec(node.getLeft(), arr, ind);
-    	arr[ind++] = node.getValue();
-    	if (node.hasRight())
-    		ind = ord_rec(node.getRight(), arr, ind);
+    		ind = drec(node.getRight(), arr, ind, b);
     	return ind;
     }
 
@@ -521,15 +521,6 @@ public class AVLTree {
         	this.height = Math.max(this.left.height, this.right.height) + 1;
             this.size = this.left.size + this.right.size + 1;
         }
-        
-//        public int in_order_rec(int[] arr, int ind) {
-//        	if (this.hasLeft())
-//    	    	ind = this.left.in_order_rec(arr, ind);
-//        	arr[ind++] = this.key;
-//        	if (this.hasRight())
-//    	    	ind = this.right.in_order_rec(arr, ind);	
-//        	return ind;
-//        }
 
 		@Override
 		public String toString() {
@@ -538,7 +529,4 @@ public class AVLTree {
 			return this.value + ":" + Integer.toString(this.key) + " " + "h = " + this.height;
 		}
     }
-
 }
-
-
