@@ -1,5 +1,6 @@
 package AVL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import AVL.AVLTree.AVLNode;
@@ -10,12 +11,16 @@ public class Tester {
 		AVLTree t = new AVLTree();
 		int[] l = {5, 4, 3, 2, 1, 8, 7, 6, 11, 12, 9, 10};
 		insertHeight(t, l);
+		int[] keys = t.keysToArray();
+		System.out.println(Arrays.toString(keys));
+		boolean[] values = t.infoToArray();
+		System.out.println(Arrays.toString(values));
 	}
 	
 	public static void insertHeight(AVLTree t, int[] l) {
 		for (int i : l) {
 			t.insert(i, true);
-			System.out.println(t.getRoot().getHeight());
+//			System.out.println(t.getRoot().getHeight());
 		}
 	}
 	
