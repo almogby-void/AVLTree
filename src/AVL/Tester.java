@@ -14,21 +14,12 @@ public class Tester {
 //		int[] l = {8, 5, 11, 3, 7, 10, 12, 2, 4, 6, 9, 1};
 		int[] l = {13, 8, 18, 5, 11, 16, 20, 3, 7, 10, 12,
 				15, 17, 19, 2, 4, 6, 9, 14, 1};
-//		int l[] = {1};
 		insertHeight(t, l);
-		int[] keys = t.keysToArray();
-		System.out.println(Arrays.toString(keys));
-//		for (int key : keys)
-//			System.out.println(key);
-		boolean[] values = t.infoToArray();
-		System.out.println(Arrays.toString(values));
-//		for (boolean value : values)
-//			System.out.println(value);
+		printKeys(t);
+		printValues(t);
 		int[] l2 = {20, 5, 3, 2, 1, 13, 15, 19, 11};
-//		int[] l2 = {1};
 		deleteHeight(t, l2);
-		keys = t.keysToArray();
-		System.out.println(Arrays.toString(keys));
+		printKeys(t);
 	}
 	
 	public static void insertHeight(AVLTree t, int[] l) {
@@ -45,6 +36,16 @@ public class Tester {
 //			System.out.println(t.getRoot().getHeight());
 			System.out.println(cnt);
 		}
+	}
+
+	public static void printKeys(AVLTree t) {
+		int[] keys = t.keysToArray();
+		System.out.println(Arrays.toString(keys));
+	}
+
+	public static void printValues(AVLTree t) {
+		boolean[] values = t.infoToArray();
+		System.out.println(Arrays.toString(values));
 	}
 	
 	public static void print(AVLNode root) {
