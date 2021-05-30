@@ -3,6 +3,11 @@ package AVL;
 import java.lang.reflect.Array;
 
 /**
+ * @author almog
+ *
+ */
+/**
+/**
  * public class AVLNode
  * <p>
  * This class represents an AVLTree with integer keys and boolean values.
@@ -13,7 +18,6 @@ import java.lang.reflect.Array;
  * However, you are allowed (and required) to implement the given functions, and can add functions of your own
  * according to your needs.
  */
-
 public class AVLTree {
 	private final AVLNode virt = new AVLNode();
 	private AVLNode root = null;
@@ -22,13 +26,17 @@ public class AVLTree {
 
     /**
      * This constructor creates an empty AVLTree.
+     * Time Complexity: Θ(1).
      */
     public AVLTree() {
         this.root = this.virt;
     }
-
+    
     /**
-	 * 
+	 * @param value
+	 * @param key
+	 * This constructor creates an AVLTree with AVLNode(value, k) as its root.
+	 * Time Complexity: Θ(1).
 	 */
 	public AVLTree(boolean value, int key) {
 		this.root = new AVLNode(value, key);
@@ -38,23 +46,37 @@ public class AVLTree {
      * public boolean empty()
      * <p>
      * returns true if and only if the tree is empty
+     * Time Complexity: Θ(1).
      */
     public boolean empty() {
         return (!this.root.isRealNode());
     }
     
+    /**
+	 * @param k
+	 * @param b
+	 * if b is false, returns the required node (or virt if it doesn't exist);
+	 * if b is true, returns the future parent of the required node (or the required node itself if it exists).
+	 * Time Complexity: Θ(log(n)).
+	 */
     private AVLNode bin_search(int k, boolean b) {
     	AVLNode x = this.root;
     	while (x.isRealNode() && x.getKey() != k)
 	    	if (x.getKey() > k) {
 	    		if (b && x.getLeft() == null)
 	    			return x;
-	    		x = x.getLeft();
+	    		if (x.hasLeft())
+	    			x = x.getLeft();
+	    		else
+	    			x = this.virt;
 	    	}
 	    	else {
 	    		if (b && x.getRight() == null)
 	    			return x;
-	    		x = x.getRight();
+	    		if (x.hasRight())
+		    		x = x.getRight();
+	    		else
+	    			x = this.virt;
 	    	}
     	return x;
     }
@@ -64,11 +86,17 @@ public class AVLTree {
      * <p>
      * returns the info of an item with key k if it exists in the tree
      * otherwise, returns null
+     * Time Complexity: Θ(log(n)).
      */
     public Boolean search(int k) {
 	    return this.bin_search(k, false).getValue();
     }
     
+    /**
+	 * @param criminal
+	 * performs a left rotation of AVLNode criminal.
+	 * Time Complexity: Θ(1).
+	 */
     private void rotateLeft(AVLNode criminal) {
     	AVLNode B = criminal.getRight();
     	if (this.root == criminal)
@@ -81,6 +109,11 @@ public class AVLTree {
 	    B.setLeft(criminal);
     }
     
+    /**
+	 * @param criminal
+	 * performs a right rotation of AVLNode criminal.
+	 * Time Complexity: Θ(1).
+	 */
     private void rotateRight(AVLNode criminal) {
     	AVLNode A = criminal.getLeft();
     	if (this.root == criminal)
@@ -101,6 +134,7 @@ public class AVLTree {
 	 * returns the number of nodes which require rebalancing operations (i.e. promotions or rotations).
 	 * This always includes the newly-created node.
      * returns -1 if an item with key k already exists in the tree.
+     * Time Complexity: Θ(log(n)).
      */
     public int insert(int k, boolean i) {
     	if (this.empty()) {
@@ -133,6 +167,7 @@ public class AVLTree {
 	    	AVLNode pred = findPred(new_node);
 	    	pred.setSucc(new_node);
     	}
+    	// rebalancing the AVLTree
     	while (((x = x.getParent()) != null) && (x.update())) {
 			if (Math.abs(x.getBF()) == 2) { // criminal has been detected
 				if (x.getBF() == -2) {
@@ -164,6 +199,7 @@ public class AVLTree {
      * the tree must remain valid (keep its invariants).
      * returns the number of nodes which required rebalancing operations (i.e. demotions or rotations).
      * returns -1 if an item with key k was not found in the tree.
+     * Time Complexity: Θ(log(n)).
      */
     public int delete(int k) {
         AVLNode x = this.bin_search(k, false);
@@ -184,6 +220,7 @@ public class AVLTree {
         }
         x = deleteBST(x);
         int count = 0;
+    	// rebalancing the AVLTree
         do {
         	boolean b = x.update();
 			if (Math.abs(x.getBF()) == 2) { // criminal has been detected
@@ -211,6 +248,11 @@ public class AVLTree {
         return count;
     }
     
+    /**
+	 * @param node
+	 * performs a standard BST deletion of AVLNode node.
+	 * Time Complexity: Θ(1).
+	 */
     private AVLNode deleteBST(AVLNode node) {
         if (node.getHeight() == 0) { // node is a leaf
         	AVLNode par = node.getParent();
@@ -266,6 +308,7 @@ public class AVLTree {
      * <p>
      * Returns the info of the item with the smallest key in the tree,
      * or null if the tree is empty
+	 * Time Complexity: Θ(1).
      */
     public Boolean min() {
     	return this.min.getValue();
@@ -276,6 +319,7 @@ public class AVLTree {
      * <p>
      * Returns the info of the item with the largest key in the tree,
      * or null if the tree is empty
+     * Time Complexity: Θ(1).
      */
     public Boolean max() {
     	return this.max.getValue();
@@ -286,6 +330,7 @@ public class AVLTree {
      * <p>
      * Returns a sorted array which contains all keys in the tree,
      * or an empty array if the tree is empty.
+     * Time Complexity: Θ(n).
      */
     public int[] keysToArray() {
         int[] arr = new int[this.size()];
@@ -300,6 +345,7 @@ public class AVLTree {
      * Returns an array which contains all info in the tree,
      * sorted by their respective keys,
      * or an empty array if the tree is empty.
+     * Time Complexity: Θ(n).
      */
     public boolean[] infoToArray() {
         boolean[] arr = new boolean[this.size()];
@@ -308,6 +354,14 @@ public class AVLTree {
         return arr;
     }
     
+    /**
+	 * @param node – the root of the current subtree;
+	 * @param arr – using reflection to avoid duplicate code;
+	 * @param ind – the current index in which we should insert the data;
+	 * @param b – determines whether to get the key or the value;
+	 * performs (in recursion) an in‐order traversal while filling the required array;
+	 * Time Complexity: Θ(n).
+	 */
     private int drec(AVLNode node, Object arr, int ind, boolean b) {
     	if (node.hasLeft())
     		ind = drec(node.getLeft(), arr, ind, b);
@@ -324,6 +378,7 @@ public class AVLTree {
      * public int size()
      * <p>
      * Returns the number of nodes in the tree.
+     * Time Complexity: Θ(1).
      */
     public int size() {
         return this.root.getSize();
@@ -333,6 +388,7 @@ public class AVLTree {
      * public int getRoot()
      * <p>
      * Returns the root AVL node, or null if the tree is empty
+     * Time Complexity: Θ(1).
      */
     public AVLNode getRoot() {
     	if (this.empty())
@@ -348,6 +404,7 @@ public class AVLTree {
      *
      * precondition: this.search(k) != null
      *
+     * Time Complexity: Θ(log(n)).
      */
     public boolean prefixXor(int k) {
     	boolean ret = false;
@@ -370,11 +427,17 @@ public class AVLTree {
      *
      * @param node - the node whose successor should be returned
      * @return the successor of 'node' if exists, null otherwise
+     * Time Complexity: Θ(1).
      */
     public AVLNode successor(AVLNode node){
         return node.getSucc();
     }
     
+    /**
+	 * @param node
+	 * @returns the successor of node or null if it's the maximum.
+	 * Time Complexity: Θ(log(n)).
+	 */
     private AVLNode findSucc(AVLNode node) {
     	if (this.max == node)
     		return null;
@@ -391,6 +454,11 @@ public class AVLTree {
     	return succ;
     }
     
+    /**
+	 * @param node
+	 * @returns the predecessor of node or null it's the minimum.
+	 * Time Complexity: Θ(log(n)).
+	 */
     private AVLNode findPred(AVLNode node) {
     	if (this.min == node)
     		return null;
@@ -415,6 +483,8 @@ public class AVLTree {
      * you reach the node of key k. Return the xor of all visited nodes.
      *
      * precondition: this.search(k) != null
+     * 
+     * Time Complexity: Θ(n).
      */
     public boolean succPrefixXor(int k){
        	boolean ret = false;
@@ -449,16 +519,20 @@ public class AVLTree {
     	private AVLNode right = null;
     	private AVLNode succ = null;
     	
+    	/**
+         * This constructor creates virtual AVLNode.
+         */
 		public AVLNode() {
 			this.key = -1;
 			this.height = -1;
 			this.size = 0;
 		}
-		
+        
         /**
-		 * @param value
-		 * @param key
-		 */
+    	 * @param value
+    	 * @param key
+    	 * This constructor creates an AVLNode with value and key.
+    	 */
 		public AVLNode(boolean value, int key) {
 			this.value = value;
 			this.key = key;
@@ -590,12 +664,5 @@ public class AVLTree {
             this.xor = this.left.xor ^ this.right.xor ^ this.value;
             return (prev != this.height);
         }
-
-		@Override
-		public String toString() {
-			if (!this.isRealNode())
-				return "null";
-			return this.value + ":" + Integer.toString(this.key) + " " + "h = " + this.height;
-		}
     }
 }
