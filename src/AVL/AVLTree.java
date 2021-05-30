@@ -352,10 +352,14 @@ public class AVLTree {
     public boolean prefixXor(int k) {
     	boolean ret = false;
     	AVLNode node = bin_search(k, false);
-    	ret ^= node.getLeft().getXor();
+    	if (node.hasLeft())
+    		ret ^= node.getLeft().getXor();
     	while ((node = node.getParent()) != null)
-    		if (node.getKey() < k)
-    			ret ^= node.getValue() ^ node.getLeft().getXor();
+    		if (node.getKey() < k) {
+    			ret ^= node.getValue();
+    			if (node.hasLeft())
+    				ret ^= node.getLeft().getXor();
+    		}
         return ret;
     }
 
