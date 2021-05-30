@@ -105,46 +105,54 @@ public class AVLTree {
     public int insert(int k, boolean i) {
     	if (this.empty()) {
     		this.min = this.max = this.root = new AVLNode(i, k);
-    		return 0;
+    		return 1;
     	}
     	AVLNode x = this.bin_search(k, true);
         if (x.getKey() == k)
         	return -1;
-        int count = 0;
     	AVLNode new_node = new AVLNode(i, k);
-    	if (x.getKey() < k)
-    		x.setRight(new_node);
-    	else
-    		x.setLeft(new_node);
-    	if (k < this.min.getKey())
+    	int count = 1;
+    	if (x.getKey() < k) {
+    		if (x.setRight(new_node))
+    			count++;
+    	}
+    	else {
+    		if (x.setLeft(new_node))
+    			count++;
+    	}
+    	if (k < this.min.getKey()) {
+    		new_node.setSucc(this.min);
     		this.min = new_node;
-    	else if (k > this.max.getKey())
+    	}
+    	else if (k > this.max.getKey()) {
+    		this.max.setSucc(new_node);
     		this.max = new_node;
-    	new_node.setSucc(findSucc(new_node));
-    	AVLNode pred = findPred(new_node);
-    	if (pred != null)
-    		pred.setSucc(new_node);
-    	while ((x = x.getParent()) != null) {
-    		x.update();
-    		if (Math.abs(x.getBF()) == 2) { // criminal has been detected
-    			if (x.getBF() == -2) {
-    				if (x.getRight().getBF() == -1) { // case1
-    					this.rotateLeft(x);
-    				}
-    				else { // case2
-    					this.rotateRight(x.getRight());
-    					this.rotateLeft(x);
-    				}
-    			}
-    			else if (x.getLeft().getBF() == -1) { // case3
-    				this.rotateLeft(x.getLeft());
+    	}
+    	else {
+	    	new_node.setSucc(findSucc(new_node));
+	    	AVLNode pred = findPred(new_node);
+	    	pred.setSucc(new_node);
+    	}
+    	while (((x = x.getParent()) != null) && (x.update())) {
+			if (Math.abs(x.getBF()) == 2) { // criminal has been detected
+				if (x.getBF() == -2) {
+					if (x.getRight().getBF() == -1) { // case1
+						this.rotateLeft(x);
+					}
+					else { // case2
+						this.rotateRight(x.getRight());
+						this.rotateLeft(x);
+					}
+				}
+				else if (x.getLeft().getBF() == -1) { // case3
+					this.rotateLeft(x.getLeft());
 					this.rotateRight(x);
-    			}
+				}
 				else { // case4
 					this.rotateRight(x);
 				}
-    			count++;
-    		}
+			}
+			count++;
     	}
         return count;
     }
@@ -161,62 +169,96 @@ public class AVLTree {
         AVLNode x = this.bin_search(k, false);
         if (!x.isRealNode())
         	return -1;
+        if (x == this.min) {
+    		this.min = x.getSucc();
+    	}
+    	else {
+    		AVLNode pred = findPred(x);
+	    	pred.setSucc(x.getSucc());
+	    	if (x == this.max)
+	    		this.max = pred;
+    	}
+        if ((this.root == x) && (x.getHeight() == 0)) {
+    		this.root = this.virt;
+    		return 0;
+        }
+        x = deleteBST(x);
         int count = 0;
-        if (x.getHeight() == 0)
-        	remove(x);
-        else if (x.hasLeft())
-        	if (x.hasRight()) {
-        		AVLNode y = x.getRight();
-        		if (!y.hasLeft())
-        			y.getParent().setRight(y.getRight());
-        		else {
-	        		while (y.hasLeft())
-	        			y = y.getLeft();
-	        		y.getParent().setLeft(y.getRight());
-        		}
-        		y.setLeft(x.getLeft());
-        		y.setRight(x.getRight());
-        		y.setParent(x.getParent());
-        	}
-        	else
-        		x.getLeft().setParent(x.getParent());
-        else
-        	x.getRight().setParent(x.getParent());
-        while ((x = x.getParent()) != null) {
-    		x.update();
-    		if (Math.abs(x.getBF()) == 2) { // criminal has been detected
-    			if (x.getBF() == -2) {
-    				if (x.getRight().getBF() == -1) { // case1
-    					this.rotateLeft(x);
-    				}
-    				else { // case2
-    					this.rotateRight(x.getRight());
-    					this.rotateLeft(x);
-    				}
-    			}
-    			else if (x.getLeft().getBF() == -1) { // case3
-    				this.rotateLeft(x.getLeft());
+        do {
+        	boolean b = x.update();
+			if (Math.abs(x.getBF()) == 2) { // criminal has been detected
+				if (x.getBF() == -2) {
+					if (x.getRight().getBF() <= 0) { // case1
+						this.rotateLeft(x);
+					}
+					else { // case2
+						this.rotateRight(x.getRight());
+						this.rotateLeft(x);
+					}
+				}
+				else if (x.getLeft().getBF() == -1) { // case3
+					this.rotateLeft(x.getLeft());
 					this.rotateRight(x);
-    			}
+				}
 				else { // case4
 					this.rotateRight(x);
 				}
-    			count++;
-    		}
-    	}
+				count++;
+			}
+			else if (b)
+				count++;
+    	} while ((x = x.getParent()) != null);
         return count;
     }
     
-    private void remove(AVLNode node) {
-    	if (this.root == node) {
-    		this.root = this.virt;
-    		return;
-    	}
-    	AVLNode par = node.getParent();
-    	if (par.getLeft() == node)
-    		par.setLeft(this.virt);
-    	else
-    		par.setRight(this.virt);
+    private AVLNode deleteBST(AVLNode node) {
+        if (node.getHeight() == 0) { // node is a leaf
+        	AVLNode par = node.getParent();
+        	if (par.getLeft() == node)
+        		par.setLeft(this.virt);
+        	else
+        		par.setRight(this.virt);
+        	return par;
+        }
+        else if (node.hasLeft())
+        	if (node.hasRight()) { // node has both children
+        		AVLNode succ = node.getSucc();
+        		AVLNode par = succ.getParent();
+        		if (par.getLeft() == succ)
+        			if (succ.hasRight())
+        				par.setLeft(succ.getRight());
+        			else
+        				par.setLeft(this.virt);
+            	else if (succ.hasRight())
+            		par.setRight(succ.getRight());
+            	else
+            		par.setRight(this.virt);
+        		if (node.hasLeft())
+        			succ.setLeft(node.getLeft());
+        		else
+        			succ.setLeft(this.virt);
+        		if (node.hasRight())
+        			succ.setRight(node.getRight());
+        		else
+        			succ.setRight(this.virt);
+        		succ.setParent(node.getParent());
+        		if (this.root == node)
+        			this.root = succ;
+        		if (par == node)
+        			return succ;
+        		return par;
+        	}
+        	else { // node has only left child
+        		node.getLeft().setParent(node.getParent());
+        		if (this.root == node)
+        			this.root = node.getLeft();
+        	}
+        else { // node has only right child
+        	node.getRight().setParent(node.getParent());
+        	if (this.root == node)
+    			this.root = node.getRight();
+        }
+        return node.getParent();
     }
 
     /**
@@ -307,8 +349,14 @@ public class AVLTree {
      * precondition: this.search(k) != null
      *
      */
-    public boolean prefixXor(int k){
-        return false;
+    public boolean prefixXor(int k) {
+    	boolean ret = false;
+    	AVLNode node = bin_search(k, false);
+    	ret ^= node.getLeft().getXor();
+    	while ((node = node.getParent()) != null)
+    		if (node.getKey() < k)
+    			ret ^= node.getValue() ^ node.getLeft().getXor();
+        return ret;
     }
 
     /**
@@ -365,7 +413,13 @@ public class AVLTree {
      * precondition: this.search(k) != null
      */
     public boolean succPrefixXor(int k){
-        return false;
+       	boolean ret = false;
+    	AVLNode node = this.min;
+    	while (node.getKey() < k) {
+    		ret ^= node.getValue();
+    		node = node.getSucc();
+    	}
+        return ret;
     }
 
 
@@ -385,6 +439,7 @@ public class AVLTree {
     	private int key;
     	private int height = 0;
     	private int size = 1;
+    	private boolean xor = false;
     	private AVLNode parent = null;
     	private AVLNode left = null;
     	private AVLNode right = null;
@@ -420,11 +475,11 @@ public class AVLTree {
         }
 
         //sets left child
-        public void setLeft(AVLNode node) {
+        public boolean setLeft(AVLNode node) {
         	this.left = node;
         	if (node.isRealNode())
         		node.parent = this;
-        	this.update();
+        	return this.update();
         }
 
         //returns left child (if there is no left child return null)
@@ -435,11 +490,11 @@ public class AVLTree {
         }
 
         //sets right child
-        public void setRight(AVLNode node) {
+        public boolean setRight(AVLNode node) {
         	this.right = node;
         	if (node.isRealNode())
         		node.parent = this;
-        	this.update();
+        	return this.update();
         }
 
         //returns right child (if there is no right child return null)
@@ -503,6 +558,13 @@ public class AVLTree {
 		}
         
 		/**
+		 * @return the xor
+		 */
+		public boolean getXor() {
+			return this.xor;
+		}
+
+		/**
 		 * @return the succ
 		 */
 		public AVLNode getSucc() {
@@ -516,10 +578,13 @@ public class AVLTree {
 			this.succ = succ;
 		}
 
-		// updates height, BF, size
-        public void update() {
+		// updates height, size and xor
+        public boolean update() {
+        	int prev = this.height;
         	this.height = Math.max(this.left.height, this.right.height) + 1;
             this.size = this.left.size + this.right.size + 1;
+            this.xor = this.left.xor ^ this.right.xor ^ this.value;
+            return (prev != this.height);
         }
 
 		@Override
