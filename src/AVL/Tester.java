@@ -14,15 +14,16 @@ public class Tester {
 //		int[] l = {8, 5, 11, 3, 7, 10, 12, 2, 4, 6, 9, 1};
 		int[] l = {13, 8, 18, 5, 11, 16, 20, 3, 7, 10, 12,
 				15, 17, 19, 2, 4, 6, 9, 14, 1};
-		insertHeight(t, l);
+		insertArr(t, l);
 		printKeys(t);
 		printValues(t);
 		int[] l2 = {20, 5, 3, 2, 1, 13, 15, 19, 11};
-		deleteHeight(t, l2);
+		searchArr(t, l2);
+		deleteArr(t, l2);
 		printKeys(t);
 	}
 	
-	public static void insertHeight(AVLTree t, int[] l) {
+	public static void insertArr(AVLTree t, int[] l) {
 		for (int i : l) {
 			int cnt = t.insert(i, (i % 2 == 0));
 //			System.out.println(t.getRoot().getHeight());
@@ -30,11 +31,18 @@ public class Tester {
 		}
 	}
 	
-	public static void deleteHeight(AVLTree t, int[] l) {
+	public static void deleteArr(AVLTree t, int[] l) {
 		for (int i : l) {
 			int cnt = t.delete(i);
 //			System.out.println(t.getRoot().getHeight());
 			System.out.println(cnt);
+		}
+	}
+	
+	public static void searchArr(AVLTree t, int[] l) {
+		for (int i : l) {
+			Boolean b = t.search(i);
+			System.out.println(b);
 		}
 	}
 
